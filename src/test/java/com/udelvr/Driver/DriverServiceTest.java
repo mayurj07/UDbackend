@@ -1,4 +1,4 @@
-package com.udelvr.Driver;
+package com.udelvr.driver;
 
 import com.udelvr.login.driver.DriverController;
 import com.udelvr.login.driver.DriverDO;

@@ -1,6 +1,7 @@
 package com.udelvr.login.signUp;
 
 import com.udelvr.UdelvrConfig;
+import com.udelvr.compression.CompressImage;
 import com.udelvr.exceptions.BadRequestException;
 import com.udelvr.login.User.User;
 import com.udelvr.login.User.UserDO;
@@ -19,6 +20,8 @@ public class SignupService {
 
     @Autowired
     private MongoTemplate mongoTemplate;
+
+    CompressImage compressUtility = new CompressImage();
 
     //genetrate alphanumericID
     public static String generateBase36ID()

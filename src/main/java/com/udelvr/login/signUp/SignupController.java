@@ -6,6 +6,7 @@ import com.sendgrid.SendGridException;
 import com.twilio.sdk.TwilioRestException;
 import com.udelvr.Twilio.SmsAuthenticator;
 import com.udelvr.Twilio.SmsSender;
+import com.udelvr.compression.CompressImage;
 import com.udelvr.exceptions.BadRequestException;
 import com.udelvr.login.User.User;
 import com.udelvr.login.User.UserDO;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -29,11 +31,18 @@ import java.util.TimeZone;
 @Component("SignupController")
 public class SignupController {
 
+    public SignupController(){}
+
+    public SignupController(SignupService signupService){
+        this.signupService=signupService;
+    }
+
     @Autowired
     SignupService signupService = new SignupService();
 
     SmsSender twilio = new SmsSender();
     SmsAuthenticator smsAuthenticator = new SmsAuthenticator();
+    CompressImage compressUtility = new CompressImage();
 
     public String giveDate()
     {
@@ -83,6 +92,15 @@ public class SignupController {
         String created_at       = giveDate();
 
         MultipartFile imageFile = request.getFile(itr.next());
+
+
+        //compression
+        File convFile = compressUtility.convertToFile(imageFile);
+        File compressedFile = compressUtility.compress(convFile);
+        byte[] compressByteArrary = compressUtility.convertFileToByteArray(compressedFile);
+
+        //end of compression
+
         byte [] userImage = imageFile.getBytes();
 
         //validation part
@@ -104,8 +122,9 @@ public class SignupController {
         if(itr == null)
             throw new BadRequestException("Profile Picture Required.");
 
+
         //create new USER object
-        User newUser = new User(id, fullName, email, mobileNo, password, userImage, deviceID, created_at);
+        User newUser = new User(id, fullName, email, mobileNo, password, deviceID, created_at, userImage, compressByteArrary);
 
         return new ResponseEntity<UserDO>(signupService.addUser(newUser), HttpStatus.CREATED);
     }
@@ -130,7 +149,7 @@ public class SignupController {
 
     @RequestMapping(value="/user/phone", method=RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
-    public void checkMobileNo(MultipartHttpServletRequest request){
+    public String checkMobileNo(MultipartHttpServletRequest request){
         String mobileNo = request.getParameter("mobileNo");
 
         //generate a digest of the user fullname
@@ -142,16 +161,34 @@ public class SignupController {
         } catch (TwilioRestException e) {
             e.printStackTrace();
         }
+        return auth;
     }
 
 
-    @RequestMapping(value = "/user/verify", method = RequestMethod.POST)
+/*    @RequestMapping(value = "/user/verify", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     public boolean sendMsg(MultipartHttpServletRequest request) throws TwilioRestException
     {
         String smsAuthCode = request.getParameter("SmsAuthCode");
         String mobileNo = request.getParameter("mobileNo");
         return smsAuthenticator.verifyPhone(mobileNo, smsAuthCode);
+    }*/
+
+
+    @RequestMapping(value = "/compress", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.OK)
+    public void compressImg(MultipartHttpServletRequest request) throws IOException {
+        Iterator<String> itr    = request.getFileNames();
+        MultipartFile imageFile = request.getFile(itr.next());
+
+        File convFile = compressUtility.convertToFile(imageFile);
+
+        compressUtility.compress(convFile);
+
+        //String sourceImage = "/Users/mayur/photu.jpg";
+        String targetImage = "/Users/mayur/photu_thumbnail.jpg";
+
+        compressUtility.saveScaledImage(convFile, targetImage);
     }
 
 }

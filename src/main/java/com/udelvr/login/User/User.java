@@ -35,9 +35,6 @@ public class User {
     @JsonProperty
     private String created_at;
 
-    @JsonProperty @JsonIgnore
-    public byte[] photo;
-
     @JsonProperty
     private String driverLicenseNo;
 
@@ -56,6 +53,13 @@ public class User {
     @JsonProperty
     private String licensePhotoURL;
 
+    @JsonProperty @JsonIgnore
+    public byte[] photo;
+
+    @JsonProperty @JsonIgnore
+    public byte[] compressedImage;
+
+
     public User(){}
 
 
@@ -65,23 +69,26 @@ public class User {
             @JsonProperty String email,
             @JsonProperty String mobileNo,
             @JsonProperty String password,
-            @JsonProperty byte[] userImage,
             @JsonProperty String deviceId,
-            @JsonProperty String created_at)
+            @JsonProperty String created_at,
+            @JsonProperty byte[] userImage,
+            @JsonProperty byte[] compressedImage)
             {
                 this.userId = userId;
-                this.fullName   = fullName;
-                this.mobileNo   = mobileNo;
-                this.email      = email;
-                this.password   = password;
-                this.photo      = userImage;
-                this.deviceId = deviceId;
-                this.created_at = created_at;
+                this.fullName           = fullName;
+                this.mobileNo           = mobileNo;
+                this.email              = email;
+                this.password           = password;
+                this.deviceId           = deviceId;
+                this.created_at         = created_at;
                 this.driverLicenseNo    = "";
                 this.licensePhoto       = new byte[0];
                 this.licenseExpiry      = new Date();
                 this.driverRating       = 0;
+                this.photo              = userImage;
+                this.compressedImage    = compressedImage;
             }
+
 
     public User(
             @JsonProperty String driverLicenseNo,
@@ -181,5 +188,10 @@ public class User {
     public String getLicensePhotoURL() { return licensePhotoURL;    }
 
     public void setLicensePhotoURL(String licensePhotoURL) {  this.licensePhotoURL = licensePhotoURL;   }
+
+    public byte[] getCompressedImage() {    return compressedImage; }
+
+    public void setCompressedImage(byte[] compressedImage) {    this.compressedImage = compressedImage; }
+
 }
 
