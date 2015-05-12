@@ -49,7 +49,7 @@ public class ShipmentService {
         {
             byte[] compressedImage = shipment.getCompressedImage();
             return compressedImage;
-        }else if (image_type.equalsIgnoreCase("thumnail"))
+        }else if (image_type.equalsIgnoreCase("thumbnail"))
         {
             byte[] thumbnailImage = shipment.getThumbnailImage();
             return thumbnailImage;
@@ -68,8 +68,8 @@ public class ShipmentService {
             throw new BadRequestException("Shipment does not exists.");
 
         String imageURL = "/shipment/"+shipment.getShipmentID()+"/image/original";
-        String compressedImageURL = "/shipment/"+shipment.getShipmentID()+"/image/original";
-        String thumbnailURL = "/shipment/"+shipment.getShipmentID()+"/image/original";
+        String compressedImageURL = "/shipment/"+shipment.getShipmentID()+"/image/compressed";
+        String thumbnailURL = "/shipment/"+shipment.getShipmentID()+"/image/thumbnail";
 
         ShipmentModelDO shipmentDO = new ShipmentModelDO(
                 shipment.getShipmentID(),
@@ -119,8 +119,8 @@ public class ShipmentService {
         for(ShipmentModel shipment : shipments)
         {
             String imageURL = "/shipment/"+shipment.getShipmentID()+"/image/original";
-            String compressedImageURL = "/shipment/"+shipment.getShipmentID()+"/image/original";
-            String thumbnailURL = "/shipment/"+shipment.getShipmentID()+"/image/original";
+            String compressedImageURL = "/shipment/"+shipment.getShipmentID()+"/image/compressed";
+            String thumbnailURL = "/shipment/"+shipment.getShipmentID()+"/image/thumbnail";
 
             ShipmentModelDO newShipmentDO = new ShipmentModelDO(
                     shipment.getShipmentID(),
@@ -178,8 +178,8 @@ public class ShipmentService {
         {
             DBObject result = cursor.next();
             String imageURL = "/shipment/"+result.get("shipmentID").toString()+"/image/original";
-            String compressedImageURL = "/shipment/"+result.get("shipmentID").toString()+"/image/original";
-            String thumbnailURL = "/shipment/"+result.get("shipmentID").toString()+"/image/original";
+            String compressedImageURL = "/shipment/"+result.get("shipmentID").toString()+"/image/compressed";
+            String thumbnailURL = "/shipment/"+result.get("shipmentID").toString()+"/image/thumbnail";
 
 
             ShipmentModelDO newShipmentDO = new ShipmentModelDO(

@@ -60,7 +60,7 @@ public class CompressImage {
     public File saveScaledImage(File file1){
 
         //String thumbnailPath  = "/Users/mayur/thumbnail.jpg";
-        String thumbnailPath = "/home/ubuntu/UDbackend/images/thumbnails/thumnail.jpg";
+        String thumbnailPath = "/home/ubuntu/UDbackend/images/thumbnails/thumbnail.jpg";
         try {
 
             BufferedImage sourceImage       = ImageIO.read(file1);
