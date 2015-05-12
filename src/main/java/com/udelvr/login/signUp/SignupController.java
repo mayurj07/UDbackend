@@ -147,17 +147,16 @@ public class SignupController {
     }
 
 
-    @RequestMapping(value="/user/phone", method=RequestMethod.POST)
+    @RequestMapping(value="/user/phone/{phone}", method=RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
-    public String checkMobileNo(MultipartHttpServletRequest request){
-        String mobileNo = request.getParameter("mobileNo");
+    public String checkMobileNo(@PathVariable(value = "phone") String phone){
 
         //generate a digest of the user fullname
-        String auth = smsAuthenticator.hmacDigest(mobileNo, "udelvr", "HmacSHA1");
+        String auth = smsAuthenticator.hmacDigest(phone, "udelvr", "HmacSHA1");
 
         //send SMS to user with verification code
         try {
-            twilio.sendSMS(mobileNo, auth);
+            twilio.sendSMS(phone, auth);
         } catch (TwilioRestException e) {
             e.printStackTrace();
         }
@@ -165,7 +164,7 @@ public class SignupController {
     }
 
 
-/*    @RequestMapping(value = "/user/verify", method = RequestMethod.POST)
+/*  @RequestMapping(value = "/user/verify", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     public boolean sendMsg(MultipartHttpServletRequest request) throws TwilioRestException
     {
