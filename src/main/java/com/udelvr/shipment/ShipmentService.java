@@ -33,16 +33,32 @@ public class ShipmentService {
         return shipment1;
     }
 
-    public byte[] getShipmentImage(String shipmentId)
+    public byte[] getShipmentImage(String shipmentId, String image_type)
     {
         Query searchUserQuery = new Query(Criteria.where("shipmentID").is(shipmentId));
         ShipmentModel shipment = mongoTemplate.findOne(searchUserQuery, ShipmentModel.class, COLLECTION_NAME);
         if(shipment == null)
             throw new BadRequestException("Shipment does not exists.");
 
-        byte[] c = shipment.getShipmentImage();
-        return c;
+        if(image_type.equalsIgnoreCase("original"))
+        {
+            byte[] originalImage = shipment.getShipmentImage();
+            return originalImage;
+        }
+        else if(image_type.equalsIgnoreCase("compressed"))
+        {
+            byte[] compressedImage = shipment.getCompressedImage();
+            return compressedImage;
+        }else if (image_type.equalsIgnoreCase("thumnail"))
+        {
+            byte[] thumbnailImage = shipment.getThumbnailImage();
+            return thumbnailImage;
+        }
+        else {
+            throw new BadRequestException("Shipment image not found");
+        }
     }
+
 
     public ShipmentModelDO getShipment(String shipmentId)
     {
@@ -51,7 +67,9 @@ public class ShipmentService {
         if(shipment == null)
             throw new BadRequestException("Shipment does not exists.");
 
-        String shipmentURL = "/shipment/"+shipment.getShipmentID()+"/image";
+        String imageURL = "/shipment/"+shipment.getShipmentID()+"/image/original";
+        String compressedImageURL = "/shipment/"+shipment.getShipmentID()+"/image/original";
+        String thumbnailURL = "/shipment/"+shipment.getShipmentID()+"/image/original";
 
         ShipmentModelDO shipmentDO = new ShipmentModelDO(
                 shipment.getShipmentID(),
@@ -68,25 +86,30 @@ public class ShipmentService {
                 shipment.getPackageWeight(),
                 shipment.getPickupTime(),
                 shipment.getPickupDate(),
-                shipmentURL,
+                imageURL,
                 shipment.getCustomerID(),
                 shipment.getStatus(),
                 shipment.getDriverID(),
-                Float.toString(shipment.getAmount())
+                Float.toString(shipment.getAmount()),
+                compressedImageURL,
+                thumbnailURL
                 );
         return shipmentDO;
     }
+
 
     public List<ShipmentModelDO> getAllCustomerShipment(String customerId) {
         Query searchUserQuery = new Query(Criteria.where("customerID").is(customerId));
         return getShipmentResults(searchUserQuery);
     }
 
+
     public List<ShipmentModelDO> getAllActiveShipmentsForDriver()
     {
         Query searchUserQuery = new Query(Criteria.where("status").is("created").andOperator(Criteria.where("driverID").is("")));
         return getShipmentResults(searchUserQuery);
     }
+
 
     public List<ShipmentModelDO> getShipmentResults(Query query)
     {
@@ -95,7 +118,10 @@ public class ShipmentService {
         List<ShipmentModelDO> newShipmentDOs = new ArrayList<ShipmentModelDO>();;
         for(ShipmentModel shipment : shipments)
         {
-            shipmentURL = "/shipment/"+shipment.getShipmentID()+"/image";
+            String imageURL = "/shipment/"+shipment.getShipmentID()+"/image/original";
+            String compressedImageURL = "/shipment/"+shipment.getShipmentID()+"/image/original";
+            String thumbnailURL = "/shipment/"+shipment.getShipmentID()+"/image/original";
+
             ShipmentModelDO newShipmentDO = new ShipmentModelDO(
                     shipment.getShipmentID(),
                     shipment.getRecipientName(),
@@ -111,16 +137,19 @@ public class ShipmentService {
                     shipment.getPackageWeight(),
                     shipment.getPickupTime(),
                     shipment.getPickupDate(),
-                    shipmentURL,
+                    imageURL,
                     shipment.getCustomerID(),
                     shipment.getStatus(),
                     shipment.getDriverID(),
-                    Float.toString(shipment.getAmount())
+                    Float.toString(shipment.getAmount()),
+                    compressedImageURL,
+                    thumbnailURL
             );
             newShipmentDOs.add(newShipmentDO);
         }
         return newShipmentDOs;
     }
+
 
     public List<ShipmentModelDO> getAllActiveShipmentsInDriverVicinity(double latitude , double longitude , int radius)
     {
@@ -148,7 +177,11 @@ public class ShipmentService {
         while (cursor.hasNext())
         {
             DBObject result = cursor.next();
-            shipmentURL = "/shipment/"+result.get("shipmentID").toString()+"/image";
+            String imageURL = "/shipment/"+result.get("shipmentID").toString()+"/image/original";
+            String compressedImageURL = "/shipment/"+result.get("shipmentID").toString()+"/image/original";
+            String thumbnailURL = "/shipment/"+result.get("shipmentID").toString()+"/image/original";
+
+
             ShipmentModelDO newShipmentDO = new ShipmentModelDO(
                     result.get("shipmentID").toString(),
                     result.get("recipientName").toString(),
@@ -164,17 +197,20 @@ public class ShipmentService {
                     result.get("packageWeight").toString(),
                     result.get("pickupTime").toString(),
                     result.get("pickupDate").toString(),
-                    shipmentURL,
+                    imageURL,
                     result.get("customerID").toString(),
                     result.get("status").toString(),
                     result.get("driverID").toString(),
-                    result.get("amount").toString()
+                    result.get("amount").toString(),
+                    compressedImageURL,
+                    thumbnailURL
             );
             newShipmentDOs.add(newShipmentDO);
 
         }
         return newShipmentDOs;
     }
+
 
     private String[] getCoordinates(Object location) {
         String reqData = location.toString();
@@ -191,6 +227,7 @@ public class ShipmentService {
         mongoTemplate.remove(searchUserQuery, ShipmentModel.class, COLLECTION_NAME);
     }
 
+
     public void changeStatustoAccept(String shipmentId, String driverID)
     {
         Update update = new Update();
@@ -204,6 +241,7 @@ public class ShipmentService {
 
     }
 
+
     public void shipmentComplete(String shipmentId)
     {
         Update update = new Update();
@@ -215,6 +253,7 @@ public class ShipmentService {
 
     }
 
+
     public void shipmentUpdateCurrentPosition(String shipmentID, double newlatitude, double newlongitude) {
         double[] coordinates = new double[] { newlongitude, newlatitude };
         Update update = new Update();
@@ -225,6 +264,7 @@ public class ShipmentService {
             throw new BadRequestException("Shipment does not exists.");
 
     }
+
 
     public String[] shipmentGetCurrentPosition(String shipmentID) {
 

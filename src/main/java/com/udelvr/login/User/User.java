@@ -62,6 +62,8 @@ public class User {
     @JsonProperty @JsonIgnore
     public byte[] thumbnailImage;
 
+
+
     public User(){}
 
 

@@ -1,5 +1,6 @@
 package com.udelvr.shipment;
 
+import com.udelvr.compression.CompressImage;
 import com.udelvr.exceptions.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -9,9 +10,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Iterator;
 import java.util.List;
 
@@ -23,6 +23,8 @@ public class ShipmentController {
 
     @Autowired
     ShipmentService shipmentService = new ShipmentService();
+
+    CompressImage compressUtility = new CompressImage();
 
     //create new shipment
     @ResponseBody
@@ -55,18 +57,18 @@ public class ShipmentController {
 
         String customerID           = user_id;
 
-        //byte[] shipmentImage        = request.getParameter("shipmentImage");
         Iterator<String> itr        = request.getFileNames();
         MultipartFile imageFile = request.getFile(itr.next());
-        //String imageName =  shipmentID + "_Image_" + imageFile.getOriginalFilename();
 
-        byte [] byteArr= imageFile.getBytes();
-        InputStream inputStream = new ByteArrayInputStream(byteArr);
+        //compression
+        File originalFile           = compressUtility.convertToFile(imageFile);
+        File compressedFile         = compressUtility.compress(originalFile);
+        byte[] compressedImage      = compressUtility.convertFileToByteArray(compressedFile);
+        File thumbnailFile          = compressUtility.saveScaledImage(compressedFile);
+        byte[] thumbnailImage       = compressUtility.convertFileToByteArray(thumbnailFile);
+        //end of compression
 
-        byte b[] = new byte[inputStream.available()];
-        inputStream.read(b);
-
-        byte[] shipmentImage = b;
+        byte[] shipmentImage = imageFile.getBytes();
 
         //validation
         if(recipientName == null || recipientName.trim().equals(""))
@@ -90,7 +92,8 @@ public class ShipmentController {
         float amount = Computation.calculateAmount(sLatitude, sLongitude, dLatitude, dLongitude, packageWeight);
         
         ShipmentModel newShipment = new ShipmentModel(shipmentID ,recipientName, sourceAddress, sLatitude, sLongitude, destinationAddress,
-                dLatitude, dLongitude ,packageDescription, packageWeight, pickupTime, pickupDate,shipmentImage, driverID , customerID , status , amount);
+                dLatitude, dLongitude ,packageDescription, packageWeight, pickupTime, pickupDate, driverID , customerID , status , amount,
+                shipmentImage, compressedImage, thumbnailImage);
 
         return new ResponseEntity<ShipmentModelDO>(shipmentService.addShipment(newShipment), HttpStatus.CREATED);
 
@@ -98,10 +101,10 @@ public class ShipmentController {
 
 
     //get shipment image
-    @RequestMapping(value="/shipment/{shipmentID}/image", method=RequestMethod.GET , produces = "image/jpeg")
-    public ResponseEntity<byte[]> getOneShipmentImage(@PathVariable(value = "shipmentID") String shipment_id) throws Exception
+    @RequestMapping(value="/shipment/{shipmentID}/image/{type}", method=RequestMethod.GET , produces = "image/jpeg")
+    public ResponseEntity<byte[]> getOneShipmentImage(@PathVariable(value = "shipmentID") String shipment_id, @PathVariable(value = "type") String type) throws Exception
     {
-        return new ResponseEntity<byte[]>(shipmentService.getShipmentImage(shipment_id), HttpStatus.OK);
+        return new ResponseEntity<byte[]>(shipmentService.getShipmentImage(shipment_id, type), HttpStatus.OK);
     }
 
     //get shipment

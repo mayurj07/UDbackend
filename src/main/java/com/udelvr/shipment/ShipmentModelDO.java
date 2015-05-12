@@ -35,7 +35,9 @@ public class ShipmentModelDO {
     @JsonProperty @NotBlank
     private String pickupDate;
 
-    private String shipmentImage;
+    private String imageUrl;
+    private String compressedImageUrl;
+    private String thumbnailUrl;
 
     @JsonProperty
     private String customerID;
@@ -55,8 +57,9 @@ public class ShipmentModelDO {
     public ShipmentModelDO(String ShipmentID, String recipientName, String currentLocationLatitude, String currentLocationLongitude,
                            String sourceAddress, String sourceLocationLatitude, String sourceLocationLongitude,
                            String destinationAddress, String destinationLocationLatitude, String destinationLocationLongitude,
-                           String packageDescription, String packageWeight, String pickupTime, String pickupDate, String shipmentImage,
-                           String customerID, String status, String driverID , String amount)
+                           String packageDescription, String packageWeight, String pickupTime, String pickupDate, String imageUrl,
+                           String customerID, String status, String driverID , String amount,
+                           String compressedImageUrl, String thumbnailUrl)
     {
         this.shipmentID = ShipmentID;
         this.recipientName = recipientName;
@@ -72,11 +75,14 @@ public class ShipmentModelDO {
         this.packageWeight = packageWeight;
         this.pickupDate = pickupDate;
         this.pickupTime = pickupTime;
-        this.shipmentImage = shipmentImage;
+        this.imageUrl = imageUrl;
         this.driverID = driverID;
         this.customerID = customerID;
         this.status = status;
         this.amount = amount;
+        this.compressedImageUrl = compressedImageUrl;
+        this.thumbnailUrl = thumbnailUrl;
+
     }
 
 
@@ -192,12 +198,12 @@ public class ShipmentModelDO {
         this.pickupDate = pickupDate;
     }
 
-    public String getShipmentImage() {
-        return shipmentImage;
+    public String getImageUrl() {
+        return imageUrl;
     }
 
-    public void setShipmentImage(String shipmentImage) {
-        this.shipmentImage = shipmentImage;
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     public String getCustomerID() {
@@ -230,6 +236,22 @@ public class ShipmentModelDO {
 
     public void setAmount(String amount) {
         this.amount = amount;
+    }
+
+    public String getCompressedImageUrl() {
+        return compressedImageUrl;
+    }
+
+    public void setCompressedImageUrl(String compressedImageUrl) {
+        this.compressedImageUrl = compressedImageUrl;
+    }
+
+    public String getThumbnailUrl() {
+        return thumbnailUrl;
+    }
+
+    public void setThumbnailUrl(String thumbnailUrl) {
+        this.thumbnailUrl = thumbnailUrl;
     }
 
 

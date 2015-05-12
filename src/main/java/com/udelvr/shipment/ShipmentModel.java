@@ -31,8 +31,6 @@ public class ShipmentModel {
     @JsonProperty @NotBlank
     private String pickupDate;
 
-    private byte[] shipmentImage;
-
     @JsonProperty
     private String customerID;
 
@@ -44,28 +42,38 @@ public class ShipmentModel {
 
     private float amount;
 
+    private byte[] shipmentImage;
+
+    public byte[] compressedImage;
+
+    public byte[] thumbnailImage;
+
+
     public ShipmentModel() {
     }
 
     public ShipmentModel(String ShipmentID, String recipientName, String sourceAddress, double sourceLat, double sourceLong, String destinationAddress, double destinationLat, double destinationLong,
-                         String packageDescription, String packageWeight, String pickupTime, String pickupDate, byte[] shipmentImage, String driverID, String customerID, String status, float amount )
+                         String packageDescription, String packageWeight, String pickupTime, String pickupDate, String driverID, String customerID, String status, float amount,
+                         byte[] shipmentImage, byte[] compressedImage, byte[] thumbnailImage)
     {
-        this.shipmentID = ShipmentID;
-        this.recipientName = recipientName;
-        this.currentLocation = new Location(sourceLong,sourceLat);
-        this.sourceAddress = sourceAddress;
-        this.sourceLocation = new Location(sourceLong,sourceLat);
-        this.destinationAddress =destinationAddress;
-        this.destinationLocation = new Location(destinationLong,destinationLat);
-        this.packageDescription =packageDescription;
-        this.packageWeight = packageWeight;
-        this.pickupDate = pickupDate;
-        this.pickupTime = pickupTime;
-        this.shipmentImage = shipmentImage;
-        this.driverID = driverID;
-        this.customerID = customerID;
-        this.status = status;
-        this.amount = amount;
+        this.shipmentID             = ShipmentID;
+        this.recipientName          = recipientName;
+        this.currentLocation        = new Location(sourceLong,sourceLat);
+        this.sourceAddress          = sourceAddress;
+        this.sourceLocation         = new Location(sourceLong,sourceLat);
+        this.destinationAddress     = destinationAddress;
+        this.destinationLocation    = new Location(destinationLong,destinationLat);
+        this.packageDescription     = packageDescription;
+        this.packageWeight          = packageWeight;
+        this.pickupDate             = pickupDate;
+        this.pickupTime             = pickupTime;
+        this.driverID               = driverID;
+        this.customerID             = customerID;
+        this.status                 = status;
+        this.amount                 = amount;
+        this.shipmentImage          = shipmentImage;
+        this.compressedImage        = compressedImage;
+        this.thumbnailImage         = thumbnailImage;
     }
 
 
@@ -196,4 +204,12 @@ public class ShipmentModel {
     public void setAmount(float amount) {
         this.amount = amount;
     }
+
+    public byte[] getCompressedImage() {    return compressedImage; }
+
+    public void setCompressedImage(byte[] compressedImage) {    this.compressedImage = compressedImage; }
+
+    public byte[] getThumbnailImage() { return thumbnailImage;  }
+
+    public void setThumbnailImage(byte[] thumbnailImage) {  this.thumbnailImage = thumbnailImage;   }
 }
