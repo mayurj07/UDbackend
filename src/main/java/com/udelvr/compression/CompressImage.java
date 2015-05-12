@@ -20,8 +20,9 @@ public class CompressImage {
     public File compress(File imageFile) throws IOException {
         //File imageFile = new File("/Users/mayur/photu.jpg");
 
-        File compressedImageFile = new File("/home/ubuntu/UDbackend/compressedImages/myimage_compressed.jpg");
 
+        //File compressedImageFile = new File("/Users/mayur/myimage_compressed.jpg");    //for local
+        File compressedImageFile = new File("/home/ubuntu/UDbackend/images/compressedImages/myimage_compressed.jpg"); // for production
         InputStream is = new FileInputStream(imageFile);
         OutputStream os = new FileOutputStream(compressedImageFile);
         float quality = 0.5f;
@@ -56,49 +57,51 @@ public class CompressImage {
     }
 
 
-    public void saveScaledImage(File file1,String outputFile){
+    public File saveScaledImage(File file1){
 
+        //String thumbnailPath  = "/Users/mayur/thumbnail.jpg";
+        String thumbnailPath = "/home/ubuntu/UDbackend/images/thumbnails/thumnail.jpg";
         try {
 
-            BufferedImage sourceImage = ImageIO.read(file1);
-            //BufferedImage sourceImage = ImageIO.read(new File(filePath));
-            int width = sourceImage.getWidth();
-            int height = sourceImage.getHeight();
+            BufferedImage sourceImage       = ImageIO.read(file1);
+            //BufferedImage sourceImage     = ImageIO.read(new File(filePath));
+            int width                       = sourceImage.getWidth();
+            int height                      = sourceImage.getHeight();
 
+            File thumnail = new File(thumbnailPath);
             if(width>height)
             {
-                float extraSize =    height-100;
-                float percentHight = (extraSize/height)*100;
-                float percentWidth = width - ((width/100)*percentHight);
-                BufferedImage img = new BufferedImage((int)percentWidth, 100, BufferedImage.TYPE_INT_RGB);
-                Image scaledImage = sourceImage.getScaledInstance((int)percentWidth, 100, Image.SCALE_SMOOTH);
+                float extraSize         =    height-100;
+                float percentHight      = (extraSize/height)*100;
+                float percentWidth      = width - ((width/100)*percentHight);
+                BufferedImage img       = new BufferedImage((int)percentWidth, 100, BufferedImage.TYPE_INT_RGB);
+                Image scaledImage       = sourceImage.getScaledInstance((int)percentWidth, 100, Image.SCALE_SMOOTH);
                 img.createGraphics().drawImage(scaledImage, 0, 0, null);
-                BufferedImage img2 = new BufferedImage(100, 100 ,BufferedImage.TYPE_INT_RGB);
-                img2 = img.getSubimage((int)((percentWidth-100)/2), 0, 100, 100);
+                BufferedImage img2      = new BufferedImage(100, 100 ,BufferedImage.TYPE_INT_RGB);
+                img2                    = img.getSubimage((int)((percentWidth-100)/2), 0, 100, 100);
 
-                ImageIO.write(img2, "jpg", new File(outputFile));
+                ImageIO.write(img2, "jpg", thumnail);
             }
             else
             {
-                float extraSize =    width-100;
-                float percentWidth = (extraSize/width)*100;
-                float  percentHight = height - ((height/100)*percentWidth);
-                BufferedImage img = new BufferedImage(100, (int)percentHight, BufferedImage.TYPE_INT_RGB);
-                Image scaledImage = sourceImage.getScaledInstance(100,(int)percentHight, Image.SCALE_SMOOTH);
+                float extraSize         =    width-100;
+                float percentWidth      = (extraSize/width)*100;
+                float  percentHight     = height - ((height/100)*percentWidth);
+                BufferedImage img       = new BufferedImage(100, (int)percentHight, BufferedImage.TYPE_INT_RGB);
+                Image scaledImage       = sourceImage.getScaledInstance(100,(int)percentHight, Image.SCALE_SMOOTH);
                 img.createGraphics().drawImage(scaledImage, 0, 0, null);
-                BufferedImage img2 = new BufferedImage(100, 100 ,BufferedImage.TYPE_INT_RGB);
-                img2 = img.getSubimage(0, (int)((percentHight-100)/2), 100, 100);
+                BufferedImage img2      = new BufferedImage(100, 100 ,BufferedImage.TYPE_INT_RGB);
+                img2                    = img.getSubimage(0, (int)((percentHight-100)/2), 100, 100);
 
-                ImageIO.write(img2, "jpg", new File(outputFile));
+                ImageIO.write(img2, "jpg", thumnail);
             }
 
-
+            return thumnail;
 
         } catch (IOException e) {
-
             e.printStackTrace();
+            throw new BadRequestException("Error creating Thumbnail of Image.");
         }
-
     }
 
 

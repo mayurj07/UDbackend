@@ -59,6 +59,8 @@ public class User {
     @JsonProperty @JsonIgnore
     public byte[] compressedImage;
 
+    @JsonProperty @JsonIgnore
+    public byte[] thumbnailImage;
 
     public User(){}
 
@@ -72,7 +74,8 @@ public class User {
             @JsonProperty String deviceId,
             @JsonProperty String created_at,
             @JsonProperty byte[] userImage,
-            @JsonProperty byte[] compressedImage)
+            @JsonProperty byte[] compressedImage,
+            @JsonProperty byte[] thumbnailImage)
             {
                 this.userId = userId;
                 this.fullName           = fullName;
@@ -87,6 +90,7 @@ public class User {
                 this.driverRating       = 0;
                 this.photo              = userImage;
                 this.compressedImage    = compressedImage;
+                this.thumbnailImage     = thumbnailImage;
             }
 
 
@@ -192,6 +196,10 @@ public class User {
     public byte[] getCompressedImage() {    return compressedImage; }
 
     public void setCompressedImage(byte[] compressedImage) {    this.compressedImage = compressedImage; }
+
+    public byte[] getThumbnailImage() { return thumbnailImage;  }
+
+    public void setThumbnailImage(byte[] thumbnailImage) {  this.thumbnailImage = thumbnailImage;   }
 
 }
 

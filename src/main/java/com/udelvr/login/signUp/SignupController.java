@@ -93,11 +93,12 @@ public class SignupController {
 
         MultipartFile imageFile = request.getFile(itr.next());
 
-
         //compression
-        File convFile = compressUtility.convertToFile(imageFile);
-        File compressedFile = compressUtility.compress(convFile);
-        byte[] compressByteArrary = compressUtility.convertFileToByteArray(compressedFile);
+        File originalFile           = compressUtility.convertToFile(imageFile);
+        File compressedFile         = compressUtility.compress(originalFile);
+        byte[] compressImage        = compressUtility.convertFileToByteArray(compressedFile);
+        File thumbnailFile          = compressUtility.saveScaledImage(compressedFile);
+        byte[] thumbnail            = compressUtility.convertFileToByteArray(thumbnailFile);
 
         //end of compression
 
@@ -124,7 +125,7 @@ public class SignupController {
 
 
         //create new USER object
-        User newUser = new User(id, fullName, email, mobileNo, password, deviceID, created_at, userImage, compressByteArrary);
+        User newUser = new User(id, fullName, email, mobileNo, password, deviceID, created_at, userImage, compressImage, thumbnail);
 
         return new ResponseEntity<UserDO>(signupService.addUser(newUser), HttpStatus.CREATED);
     }
@@ -187,7 +188,7 @@ public class SignupController {
         //String sourceImage = "/Users/mayur/photu.jpg";
         String targetImage = "/Users/mayur/photu_thumbnail.jpg";
 
-        compressUtility.saveScaledImage(convFile, targetImage);
+        //compressUtility.saveScaledImage(convFile, targetImage);
     }
 
 }
