@@ -20,7 +20,7 @@ public class CompressImage {
     public File compress(File imageFile) throws IOException {
         //File imageFile = new File("/Users/mayur/photu.jpg");
 
-        File compressedImageFile = new File("/Users/mayur/myimage_compressed.jpg");
+        File compressedImageFile = new File("/home/ubuntu/UDbackend/compressedImages/myimage_compressed.jpg");
 
         InputStream is = new FileInputStream(imageFile);
         OutputStream os = new FileOutputStream(compressedImageFile);
