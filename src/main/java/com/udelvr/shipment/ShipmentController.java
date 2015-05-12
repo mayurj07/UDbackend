@@ -145,7 +145,7 @@ public class ShipmentController {
         double sLongitude           = Double.parseDouble(longitude);
         int    rad                  = Integer.parseInt(radius);
 
-        return new ResponseEntity<List<ShipmentModelDO>>(shipmentService.getAllActiveShipmentsInDriverVicinity(sLatitude,sLongitude,rad), HttpStatus.OK);
+        return new ResponseEntity<List<ShipmentModelDO>>(shipmentService.getAllActiveShipmentsInDriverVicinity(sLatitude, sLongitude, rad), HttpStatus.OK);
     }
 
     //update the driver id and the status to accepted once shipment accepted by driver
@@ -186,5 +186,11 @@ public class ShipmentController {
     {
         int aNumber = (int)((Math.random() * 900000)+100000);
         return ""+aNumber;
+    }
+
+    @RequestMapping(value="/driver/{driverId}/packages", method=RequestMethod.GET)
+    public ResponseEntity<List<ShipmentModel>> driverPackages(@PathVariable(value = "driverId") String driverId) throws Exception
+    {
+        return new ResponseEntity<List<ShipmentModel>>(shipmentService.driverPackages(driverId), HttpStatus.OK);
     }
 }

@@ -18,6 +18,8 @@ public class SignupService {
 
     public static final String COLLECTION_NAME = "users";
 
+    EmailAuth emailAuth = new EmailAuth();
+
     @Autowired
     private MongoTemplate mongoTemplate;
 
@@ -93,4 +95,24 @@ public class SignupService {
         }
 
     }
+
+    public boolean verifyEmail(String id,String auth) throws Exception{
+
+        //System.out.println("id---" + id);
+
+        User user = mongoTemplate.findById(id, User.class, "users");
+
+        String reverseAuth = emailAuth.hmacDigest(user.getUserId(), "udelvr", "HmacSHA1");
+
+        if(reverseAuth.equals(auth))
+        {
+            //System.out.println("Authenticated");
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
 }

@@ -37,6 +37,9 @@ public class SignupController {
         this.signupService=signupService;
     }
 
+    EmailAuth emailAuth = new EmailAuth();
+
+
     @Autowired
     SignupService signupService = new SignupService();
 
@@ -65,22 +68,6 @@ public class SignupController {
     @RequestMapping(value="/user/signup", method=RequestMethod.POST, produces = "application/json")
     public ResponseEntity<UserDO> create_user(MultipartHttpServletRequest request) throws IOException
     {
-        SendGrid sendgrid = new SendGrid("apikey"); //add api key or username & password
-
-        SendGrid.Email email1 = new SendGrid.Email();
-        email1.addTo(""); //add email here
-        email1.setFrom("registration@udelvr.com");
-        email1.setSubject("Welcome to Udelvr");
-        email1.setText("Hello " + request.getParameter("fullName") + ". Welcome to Udelvr." +
-                " We hope you have a great time using UDelvr! Happy Shipping!");
-
-        try {
-            SendGrid.Response response = sendgrid.send(email1);
-            System.out.println(response.getMessage());
-        }
-        catch (SendGridException e) {
-            System.err.println(e);
-        }
 
         Iterator<String> itr    = request.getFileNames();
         String id               = generateID();
@@ -99,7 +86,6 @@ public class SignupController {
         byte[] compressImage        = compressUtility.convertFileToByteArray(compressedFile);
         File thumbnailFile          = compressUtility.saveScaledImage(compressedFile);
         byte[] thumbnail            = compressUtility.convertFileToByteArray(thumbnailFile);
-
         //end of compression
 
         byte [] userImage = imageFile.getBytes();
@@ -126,6 +112,30 @@ public class SignupController {
 
         //create new USER object
         User newUser = new User(id, fullName, email, mobileNo, password, deviceID, created_at, userImage, compressImage, thumbnail);
+
+
+        String auth = emailAuth.hmacDigest(id, "udelvr", "HmacSHA1");
+        SendGrid sendgrid = new SendGrid("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"); //add api key or username & password
+        String url = "http://localhost:8080";
+        String html = "Hello " + request.getParameter("fullName") + ",<br><br> Welcome to Udelvr." +
+                " We hope you have a great time using UDelvr! Happy Shipping!<br><br>" +
+                "<a href=\""+url+"/user/verifyemail/"+id+"/"+auth+"\">Please click on the link to verify your account</a><br><br>" +
+                "Best Regards,<br>Udelvr Team";
+        SendGrid.Email email1 = new SendGrid.Email();
+        email1.addTo(request.getParameter("email")); //add email here
+        email1.setFrom("registration@udelvr.com");
+        email1.setSubject("Welcome to Udelvr");
+//        email1.setText("Hello " + request.getParameter("fullName") + ". Welcome to Udelvr." +
+//                " We hope you have a great time using UDelvr! Happy Shipping!");
+        email1.setHtml(html);
+
+        try {
+            SendGrid.Response response = sendgrid.send(email1);
+            System.out.println(response.getMessage());
+        }
+        catch (SendGridException e) {
+            System.err.println(e);
+        }
 
         return new ResponseEntity<UserDO>(signupService.addUser(newUser), HttpStatus.CREATED);
     }
@@ -165,30 +175,11 @@ public class SignupController {
     }
 
 
-/*  @RequestMapping(value = "/user/verify", method = RequestMethod.POST)
+    @RequestMapping(value = "/user/verifyemail/{id}/{auth}", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
-    public boolean sendMsg(MultipartHttpServletRequest request) throws TwilioRestException
+    public boolean verifyEmail(@PathVariable(value="id") String id,@PathVariable(value="auth") String auth) throws Exception
     {
-        String smsAuthCode = request.getParameter("SmsAuthCode");
-        String mobileNo = request.getParameter("mobileNo");
-        return smsAuthenticator.verifyPhone(mobileNo, smsAuthCode);
-    }*/
-
-
-    @RequestMapping(value = "/compress", method = RequestMethod.POST)
-    @ResponseStatus(HttpStatus.OK)
-    public void compressImg(MultipartHttpServletRequest request) throws IOException {
-        Iterator<String> itr    = request.getFileNames();
-        MultipartFile imageFile = request.getFile(itr.next());
-
-        File convFile = compressUtility.convertToFile(imageFile);
-
-        compressUtility.compress(convFile);
-
-        //String sourceImage = "/Users/mayur/photu.jpg";
-        String targetImage = "/Users/mayur/photu_thumbnail.jpg";
-
-        //compressUtility.saveScaledImage(convFile, targetImage);
+        return signupService.verifyEmail(id,auth);
     }
 
 }

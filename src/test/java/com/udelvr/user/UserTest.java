@@ -25,11 +25,12 @@ public class UserTest {
         //then
         //assertThat(tempDriver).isNotNull();
         //pass test
-        //assert tempUser.toString().equals("<200 OK,com.udelvr.login.User.UserDO@1dfe2924,{}>");
+        assert tempUser.getBody().getEmail().equals("nk@gmail.com");
+        assert tempUser.getBody().getMobileNo().equals("123");
 
         //fail test
-        //assert tempUser.toString().equals("<201 CREATED,com.udelvr.login.User.UserDO@1dfe2924,{}>");
-        //assert tempDriver.getDriverRating().equals(4);
+        //assert tempUser.getBody().getEmail().equals("nk1@gmail.com");
+        //assert tempUser.getBody().getMobileNo().equals("1234");
 
     }
 

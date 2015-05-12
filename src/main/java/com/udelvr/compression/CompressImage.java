@@ -22,7 +22,7 @@ public class CompressImage {
 
 
         //File compressedImageFile = new File("/Users/mayur/myimage_compressed.jpg");    //for local
-        File compressedImageFile = new File("/home/ubuntu/UDbackend/images/compressedImages/myimage_compressed.jpg"); // for production
+        File compressedImageFile = new File("/home/ubuntu/UDbackend/images/compressedImages/compressed.jpg"); // for production
         InputStream is = new FileInputStream(imageFile);
         OutputStream os = new FileOutputStream(compressedImageFile);
         float quality = 0.5f;

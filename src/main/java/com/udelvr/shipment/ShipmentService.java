@@ -49,7 +49,8 @@ public class ShipmentService {
         {
             byte[] compressedImage = shipment.getCompressedImage();
             return compressedImage;
-        }else if (image_type.equalsIgnoreCase("thumbnail"))
+        }
+        else if (image_type.equalsIgnoreCase("thumbnail"))
         {
             byte[] thumbnailImage = shipment.getThumbnailImage();
             return thumbnailImage;
@@ -231,7 +232,7 @@ public class ShipmentService {
     public void changeStatustoAccept(String shipmentId, String driverID)
     {
         Update update = new Update();
-        update.set("driverID",driverID);
+        update.set("driverID", driverID);
         update.set("status","accepted");
 
         Query searchUserQuery1 = new Query(Criteria.where("shipmentID").is(shipmentId));
@@ -275,6 +276,16 @@ public class ShipmentService {
 
         String[] coordinates = new String[]{ shipment.getCurrentLocation().getCoordinates()[0] ,shipment.getCurrentLocation().getCoordinates()[1] };
         return coordinates;
+
+    }
+
+    public List<ShipmentModel> driverPackages(String driverId){
+
+        //System.out.println("----in service");
+        Query searchUserQuery = new Query(Criteria.where("driverID").is(driverId));
+        List<ShipmentModel> packages = mongoTemplate.find(searchUserQuery, ShipmentModel.class, COLLECTION_NAME);
+
+        return packages;
 
     }
 }
